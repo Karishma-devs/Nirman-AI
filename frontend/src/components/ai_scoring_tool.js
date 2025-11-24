@@ -11,34 +11,6 @@ const CommunicationScoringTool = () => {
   // API endpoint
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
-  // Sample rubric data (in production, this would come from backend/Excel)
-  const sampleRubric = [
-    {
-      name: "Clarity and Articulation",
-      description: "Clear pronunciation and well-structured sentences",
-      keywords: ["clear", "articulate", "precise", "understandable", "coherent", "structured"],
-      weight: 0.25
-    },
-    {
-      name: "Content Quality",
-      description: "Relevant, informative, and well-organized content",
-      keywords: ["relevant", "informative", "detailed", "organized", "evidence", "examples"],
-      weight: 0.30
-    },
-    {
-      name: "Engagement",
-      description: "Ability to maintain audience interest",
-      keywords: ["engaging", "interesting", "compelling", "attention", "enthusiasm", "dynamic"],
-      weight: 0.20
-    },
-    {
-      name: "Language Proficiency",
-      description: "Proper grammar, vocabulary, and language use",
-      keywords: ["vocabulary", "grammar", "language", "professional", "appropriate", "fluent"],
-      weight: 0.25
-    }
-  ];
-
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'text/plain') {
@@ -77,18 +49,34 @@ const CommunicationScoringTool = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript: transcript }),
       });
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `API error: ${response.status}`);
       }
 
       const data = await response.json();
+      
+      // Validate the response structure
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format from API');
+      }
+      
+      if (data.criteria && !Array.isArray(data.criteria)) {
+        throw new Error('Invalid criteria format in API response');
+      }
+      
       setResults(data);
       setLoading(false);
     } catch (err) {
-      setError(`Failed to analyze transcript: ${err.message}`);
+      // Check if it's a network error (backend not running)
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('Failed to connect to the backend API. Please make sure the backend server is running on http://localhost:8000');
+      } else {
+        setError(`Failed to analyze transcript: ${err.message}`);
+      }
       setLoading(false);
     }
   };
@@ -184,11 +172,11 @@ const CommunicationScoringTool = () => {
                     Overall Score
                   </h2>
                   <p className="text-gray-600">
-                    Based on {results.criteria.length} criteria • {results.totalWords} words
+                    Based on {results.criteria?.length ?? results.criterias?.length ?? 0} criteria • {results.totalWords ?? results.total_words ?? 0} words
                   </p>
                 </div>
-                <div className={`text-6xl font-bold ${getScoreColor(results.overallScore)}`}>
-                  {results.overallScore}
+                <div className={`text-6xl font-bold ${getScoreColor(results.overallScore ?? results.overall_score ?? 0)}`}>
+                  {results.overallScore ?? results.overall_score ?? 0}
                   <span className="text-2xl">/100</span>
                 </div>
               </div>
@@ -200,107 +188,119 @@ const CommunicationScoringTool = () => {
                 Detailed Criteria Analysis
               </h3>
               
-              {results.criteria.map((criterion, index) => (
-                <div
-                  key={index}
-                  className={`bg-white rounded-lg shadow-md border-2 transition ${getScoreBg(criterion.score)}`}
-                >
+              {(results.criteria ?? results.criterias ?? []).map((criterion, index) => {
+                // Fallback lookup for camelCase and snake_case fields
+                const name = criterion.name ?? '';
+                const description = criterion.description ?? '';
+                const score = criterion.score ?? 0;
+                const weight = criterion.weight ?? 0;
+                const semanticSimilarity = criterion.semanticSimilarity ?? criterion.semantic_similarity ?? 0;
+                const keywordsFound = criterion.keywordsFound ?? criterion.keywords_found ?? [];
+                const keywordsMissing = criterion.keywordsMissing ?? criterion.keywords_missing ?? [];
+                const lengthFeedback = criterion.lengthFeedback ?? criterion.length_feedback ?? '';
+                
+                return (
                   <div
-                    onClick={() => toggleCriterion(index)}
-                    className="p-4 cursor-pointer flex items-center justify-between"
+                    key={index}
+                    className={`bg-white rounded-lg shadow-md border-2 transition ${getScoreBg(score)}`}
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-lg font-semibold text-gray-800">
-                          {criterion.name}
-                        </h4>
-                        <div className="flex items-center space-x-3">
-                          <span className="text-sm text-gray-600">
-                            Weight: {(criterion.weight * 100).toFixed(0)}%
-                          </span>
-                          <span className={`text-2xl font-bold ${getScoreColor(criterion.score)}`}>
-                            {criterion.score}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {criterion.description}
-                      </p>
-                    </div>
-                    <div className="ml-4">
-                      {expandedCriteria[index] ? 
-                        <ChevronUp size={24} className="text-gray-400" /> : 
-                        <ChevronDown size={24} className="text-gray-400" />
-                      }
-                    </div>
-                  </div>
-
-                  {expandedCriteria[index] && (
-                    <div className="px-4 pb-4 border-t border-gray-200 pt-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Semantic Similarity */}
-                        <div>
-                          <h5 className="font-semibold text-gray-700 mb-2">
-                            Semantic Similarity
-                          </h5>
-                          <div className="flex items-center">
-                            <div className="flex-1 bg-gray-200 rounded-full h-3 mr-3">
-                              <div
-                                className="bg-blue-600 h-3 rounded-full"
-                                style={{ width: `${criterion.semanticSimilarity}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold">
-                              {criterion.semanticSimilarity}%
+                    <div
+                      onClick={() => toggleCriterion(index)}
+                      className="p-4 cursor-pointer flex items-center justify-between"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-lg font-semibold text-gray-800">
+                            {name}
+                          </h4>
+                          <div className="flex items-center space-x-3">
+                            <span className="text-sm text-gray-600">
+                              Weight: {(weight * 100).toFixed(0)}%
+                            </span>
+                            <span className={`text-2xl font-bold ${getScoreColor(score)}`}>
+                              {score}
                             </span>
                           </div>
                         </div>
-
-                        {/* Length Feedback */}
-                        <div>
-                          <h5 className="font-semibold text-gray-700 mb-2">
-                            Length Feedback
-                          </h5>
-                          <p className="text-sm text-gray-600">
-                            {criterion.lengthFeedback}
-                          </p>
-                        </div>
+                        <p className="text-sm text-gray-600">
+                          {description}
+                        </p>
                       </div>
+                      <div className="ml-4">
+                        {expandedCriteria[index] ? 
+                          <ChevronUp size={24} className="text-gray-400" /> : 
+                          <ChevronDown size={24} className="text-gray-400" />
+                        }
+                      </div>
+                    </div>
 
-                      {/* Keywords */}
-                      <div className="mt-4">
-                        <h5 className="font-semibold text-gray-700 mb-2">
-                          Keywords Analysis
-                        </h5>
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {criterion.keywordsFound.map((kw, i) => (
-                            <span
-                              key={i}
-                              className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs flex items-center"
-                            >
-                              <CheckCircle size={14} className="mr-1" />
-                              {kw}
-                            </span>
-                          ))}
+                    {expandedCriteria[index] && (
+                      <div className="px-4 pb-4 border-t border-gray-200 pt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Semantic Similarity */}
+                          <div>
+                            <h5 className="font-semibold text-gray-700 mb-2">
+                              Semantic Similarity
+                            </h5>
+                            <div className="flex items-center">
+                              <div className="flex-1 bg-gray-200 rounded-full h-3 mr-3">
+                                <div
+                                  className="bg-blue-600 h-3 rounded-full"
+                                  style={{ width: `${semanticSimilarity}%` }}
+                                />
+                              </div>
+                              <span className="text-sm font-semibold">
+                                {semanticSimilarity}%
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Length Feedback */}
+                          <div>
+                            <h5 className="font-semibold text-gray-700 mb-2">
+                              Length Feedback
+                            </h5>
+                            <p className="text-sm text-gray-600">
+                              {lengthFeedback}
+                            </p>
+                          </div>
                         </div>
-                        {criterion.keywordsMissing.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {criterion.keywordsMissing.map((kw, i) => (
+
+                        {/* Keywords */}
+                        <div className="mt-4">
+                          <h5 className="font-semibold text-gray-700 mb-2">
+                            Keywords Analysis
+                          </h5>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {keywordsFound.map((kw, i) => (
                               <span
                                 key={i}
-                                className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs flex items-center"
+                                className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs flex items-center"
                               >
-                                <XCircle size={14} className="mr-1" />
+                                <CheckCircle size={14} className="mr-1" />
                                 {kw}
                               </span>
                             ))}
                           </div>
-                        )}
+                          {keywordsMissing.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {keywordsMissing.map((kw, i) => (
+                                <span
+                                  key={i}
+                                  className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs flex items-center"
+                                >
+                                  <XCircle size={14} className="mr-1" />
+                                  {kw}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
