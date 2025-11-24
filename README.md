@@ -1,70 +1,172 @@
-# Getting Started with Create React App
+# AI Communication Scoring Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project provides an AI-powered tool for evaluating spoken communication transcripts. It analyzes transcripts based on multiple criteria including clarity, content quality, engagement, and language proficiency.
 
-## Available Scripts
+## Project Structure
 
-In the project directory, you can run:
+```
+.
+├── backend/           # FastAPI backend service
+│   ├── api/           # API route definitions
+│   ├── models/        # Data models and schemas
+│   ├── utils/         # Utility functions
+│   ├── main.py        # Application entry point
+│   └── requirements.txt # Python dependencies
+├── frontend/          # React frontend application
+│   ├── public/        # Static assets
+│   └── src/           # Source code
+│       ├── components/ # React components
+│       └── ...         # Other React source files
+└── README.md          # This file
+```
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Multi-Criteria Analysis**: Evaluates transcripts based on four key criteria:
+  - Clarity and Articulation (25%)
+  - Content Quality (30%)
+  - Engagement (20%)
+  - Language Proficiency (25%)
+- **Keyword Detection**: Identifies relevant keywords in the transcript
+- **Semantic Similarity**: Uses sentence transformers to understand context and meaning
+- **Word Count Compliance**: Ensures optimal transcript length
+- **Detailed Feedback**: Provides actionable insights for improvement
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Setup Instructions
 
-### `npm test`
+### Backend Setup
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-### `npm run build`
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Activate the virtual environment:
+   - On Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On macOS/Linux:
+     ```bash
+     source venv/bin/activate
+     ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+5. Run the backend server:
+   ```bash
+   python main.py
+   ```
 
-### `npm run eject`
+   The backend API will be available at `http://localhost:8000`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Frontend Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. Install the required dependencies:
+   ```bash
+   npm install
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-## Learn More
+   The frontend will be available at `http://localhost:3000`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## API Endpoints
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `GET /` - Health check endpoint
+- `POST /score` - Score a communication transcript
+- `GET /rubric` - Get the current scoring rubric
 
-### Code Splitting
+## Testing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+To test the backend API, run the test script:
 
-### Analyzing the Bundle Size
+```bash
+cd backend
+python test_script.py
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Deployment
 
-### Making a Progressive Web App
+### Backend Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+For production deployment, consider using a platform like Heroku, AWS, or Google Cloud Platform. You'll need to:
 
-### Advanced Configuration
+1. Set environment variables:
+   - `FRONTEND_URL`: The URL of your frontend application (for CORS)
+   - `RUBRIC_FILE`: Path to a custom rubric Excel file (optional)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+2. Use a production WSGI server like Gunicorn:
+   ```bash
+   pip install gunicorn
+   gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app
+   ```
 
-### Deployment
+### Frontend Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+For production deployment, build the React application:
 
-### `npm run build` fails to minify
+```bash
+cd frontend
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The build artifacts will be in the `build/` directory, which can be served by any static file server.
+
+## Docker Deployment
+
+This project includes Docker support for easy deployment:
+
+1. Build and run the containers:
+   ```bash
+   docker-compose up --build
+   ```
+
+2. The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:8000`.
+
+## Customization
+
+### Rubric Customization
+
+You can customize the scoring rubric by creating an Excel file named `rubric.xlsx` with the following columns:
+- `name`: Criterion name
+- `description`: Criterion description
+- `keywords`: Comma-separated list of keywords
+- `weight`: Weight of the criterion (0.0 to 1.0)
+- `min_words`: Minimum recommended word count
+- `max_words`: Maximum recommended word count
+
+Place this file in the backend directory, and the application will automatically use it.
+
+Example `rubric.xlsx` structure:
+| name | description | keywords | weight | min_words | max_words |
+|------|-------------|----------|--------|-----------|-----------|
+| Clarity and Articulation | Clear pronunciation and well-structured sentences | clear, articulate, precise, understandable | 0.25 | 50 | 500 |
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
