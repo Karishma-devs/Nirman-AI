@@ -89,3 +89,38 @@ code {
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
+
+/* Metric card enhancements */
+.metric-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Score visualization */
+.score-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #e5e7eb, #d1d5db);
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
+}
+
+/* Keyword tags */
+.keyword-tag {
+  transition: all 0.2s ease-in-out;
+}
+
+.keyword-tag:hover {
+  transform: scale(1.05);
+}

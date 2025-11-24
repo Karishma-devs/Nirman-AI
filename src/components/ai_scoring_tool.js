@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, TrendingUp, CheckCircle, XCircle, ChevronDown, ChevronUp, Sparkles, BarChart3, MessageSquare, BookOpen } from 'lucide-react';
+import { Upload, FileText, TrendingUp, CheckCircle, XCircle, ChevronDown, ChevronUp, Sparkles, BarChart3, MessageSquare, BookOpen, Target, Lightbulb, Award } from 'lucide-react';
 
 const CommunicationScoringTool = () => {
   const [transcript, setTranscript] = useState('');
@@ -221,19 +221,100 @@ const CommunicationScoringTool = () => {
                 </div>
               </div>
               
-              {/* Performance Summary */}
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-indigo-50/40 p-5 rounded-2xl border border-indigo-100/30">
-                  <h3 className="font-bold text-indigo-700 text-lg mb-2">Strengths</h3>
-                  <p className="text-gray-700">Your communication shows good structure and clarity in key areas.</p>
+              {/* Enhanced Performance Metrics Grid */}
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Strengths Card */}
+                <div className="bg-gradient-to-br from-indigo-50/70 to-purple-50/70 p-6 rounded-2xl border border-indigo-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                      <Award className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <h3 className="font-bold text-indigo-800 text-xl">Strengths</h3>
+                  </div>
+                  <p className="text-gray-700 mb-4">
+                    Your communication demonstrates strong foundational skills in key areas.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                      Clear Structure
+                    </span>
+                    <span className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                      Good Flow
+                    </span>
+                  </div>
                 </div>
-                <div className="bg-amber-50/40 p-5 rounded-2xl border border-amber-100/30">
-                  <h3 className="font-bold text-amber-700 text-lg mb-2">Opportunities</h3>
-                  <p className="text-gray-700">Focus on expanding vocabulary and adding more engaging elements.</p>
+                
+                {/* Opportunities Card */}
+                <div className="bg-gradient-to-br from-amber-50/70 to-orange-50/70 p-6 rounded-2xl border border-amber-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mr-4">
+                      <Target className="h-6 w-6 text-amber-600" />
+                    </div>
+                    <h3 className="font-bold text-amber-800 text-xl">Opportunities</h3>
+                  </div>
+                  <p className="text-gray-700 mb-4">
+                    Areas where targeted improvement could significantly enhance your communication.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                      Vocabulary Depth
+                    </span>
+                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                      Engagement
+                    </span>
+                  </div>
                 </div>
-                <div className="bg-emerald-50/40 p-5 rounded-2xl border border-emerald-100/30">
-                  <h3 className="font-bold text-emerald-700 text-lg mb-2">Recommendations</h3>
-                  <p className="text-gray-700">Practice incorporating storytelling and concrete examples.</p>
+                
+                {/* Recommendations Card */}
+                <div className="bg-gradient-to-br from-emerald-50/70 to-green-50/70 p-6 rounded-2xl border border-emerald-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mr-4">
+                      <Lightbulb className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <h3 className="font-bold text-emerald-800 text-xl">Recommendations</h3>
+                  </div>
+                  <p className="text-gray-700 mb-4">
+                    Actionable strategies to elevate your communication effectiveness.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                      Storytelling
+                    </span>
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                      Examples
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Key Metrics Card */}
+                <div className="bg-gradient-to-br from-purple-50/70 to-indigo-50/70 p-6 rounded-2xl border border-purple-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                      <BarChart3 className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <h3 className="font-bold text-purple-800 text-xl">Key Metrics</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700">Avg. Criterion Score</span>
+                      <span className="font-bold text-purple-700">
+                        {Math.round((results.criteria ?? results.criterias ?? []).reduce((sum, criterion) => sum + (criterion.score ?? 0), 0) / (results.criteria?.length || 1))}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700">Top Performing</span>
+                      <span className="font-bold text-purple-700">
+                        {(() => {
+                          const criteria = results.criteria ?? results.criterias ?? [];
+                          if (criteria.length === 0) return 'N/A';
+                          const top = criteria.reduce((max, criterion) => 
+                            (criterion.score ?? 0) > (max.score ?? 0) ? criterion : max
+                          );
+                          return top.name ?? 'N/A';
+                        })()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -313,8 +394,8 @@ const CommunicationScoringTool = () => {
                       {expandedCriteria[index] && (
                         <div className="px-6 pb-6 border-t border-gray-200/30 pt-5">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                            {/* Semantic Similarity */}
-                            <div className="bg-gradient-to-br from-indigo-50/50 to-purple-50/50 p-4 rounded-xl border border-indigo-100/30">
+                            {/* Semantic Similarity Card */}
+                            <div className="bg-gradient-to-br from-indigo-50/50 to-purple-50/50 p-4 rounded-xl border border-indigo-100/30 shadow-sm">
                               <h5 className="font-bold text-gray-800 mb-3 flex items-center">
                                 <BarChart3 size={20} className="mr-2 text-indigo-600" />
                                 Semantic Similarity
@@ -332,8 +413,8 @@ const CommunicationScoringTool = () => {
                               </div>
                             </div>
 
-                            {/* Length Feedback */}
-                            <div className="bg-gradient-to-br from-purple-50/50 to-indigo-50/50 p-4 rounded-xl border border-purple-100/30">
+                            {/* Length Feedback Card */}
+                            <div className="bg-gradient-to-br from-purple-50/50 to-indigo-50/50 p-4 rounded-xl border border-purple-100/30 shadow-sm">
                               <h5 className="font-bold text-gray-800 mb-3">
                                 Length Feedback
                               </h5>
@@ -343,8 +424,8 @@ const CommunicationScoringTool = () => {
                             </div>
                           </div>
 
-                          {/* Keywords */}
-                          <div className="bg-white/40 p-4 rounded-xl border border-gray-200/30">
+                          {/* Keywords Analysis Card */}
+                          <div className="bg-white/40 p-4 rounded-xl border border-gray-200/30 shadow-sm">
                             <h5 className="font-bold text-gray-800 mb-4 text-lg">
                               Keywords Analysis
                             </h5>
